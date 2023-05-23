@@ -1,0 +1,29 @@
+name: Test
+on:
+  push:
+    branches: [ "main" ]
+jobs:
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: 
+          - macos-11
+          - macos-12
+          - macos-13
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Test
+        run: |
+          make
+          ./nsexception || true
+          ./crashinfo || true
+          sleep 10
+          ls -l ~/Library/Logs/DiagnosticReports
+      - name: Archive
+        uses: actions/upload-artifact@v3
+        with:
+          name: crash-logs
+          path: ~/Library/Logs/DiagnosticReports/*
